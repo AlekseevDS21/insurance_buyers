@@ -1,1 +1,4 @@
-# insurance_buyers
+
+```
+docker compose up -d 
+```
