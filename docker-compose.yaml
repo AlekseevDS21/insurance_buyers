@@ -1,24 +1,34 @@
-version: '3.8'
-
 services:
   titanic-api:
     build:
       context: .
       dockerfile: titanic-api/Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
     image: titanic-api:latest
     container_name: titanic-api
+    restart: unless-stopped
     ports:
       - "5000:5000"
     volumes:
       - ./titanic-api/model.pkl:/app/model.pkl
+      # Для разработки:
+      # - ./titanic-api:/app
 
   streamlit-web:
     build:
       context: .
       dockerfile: streamlit-service/Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
     image: streamlit-service:latest
     container_name: streamlit-service
+    restart: unless-stopped
     ports:
       - "8501:8501"
     volumes:
       - ./streamlit-service/streamlit_app.py:/app/streamlit_app.py
+      # Для разработки:
+      # - ./streamlit-service:/app
+    depends_on:
+      - titanic-api
