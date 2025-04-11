@@ -21,6 +21,12 @@ from fastapi import FastAPI, Request, HTTPException
 import pickle
 import pandas as pd
 from pydantic import BaseModel
+import random  # добавлено для генерации случайных предсказаний
+import logging
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -31,11 +37,15 @@ with open('model.pkl', 'rb') as f:
 # Счетчик запросов
 request_count = 0
 
-# Модель для валидации входных данных
+# Обновленная модель для валидации входных данных
 class PredictionInput(BaseModel):
     Pclass: int
-    Age: float
-    Fare: float
+    Age: int
+    CarAge: int
+    InsuranceCost: int
+    DaysWithCompany: int
+    HasLicence: int
+    HasDamage: int
 
 @app.get("/stats")
 def stats():
@@ -46,24 +56,39 @@ def health():
     return {"status": "OK"}
 
 @app.post("/predict_model")
-def predict_model(input_data: PredictionInput):
+async def predict_model(input_data: PredictionInput):
     global request_count
     request_count += 1
 
-    # Создание DataFrame из данных
-    new_data = pd.DataFrame({
-        'Pclass': [input_data.Pclass],
-        'Age': [input_data.Age],
-        'Fare': [input_data.Fare]
-    })
+    # Логируем входные данные для отладки
+    logger.info(f"Получены данные: {input_data.dict()}")
 
-    # Предсказание
-    predictions = model.predict(new_data)
+    try:
+        # Создаем DataFrame из данных
+        new_data = pd.DataFrame({
+            'Pclass': [input_data.Pclass],
+            'Age': [input_data.Age],
+            'CarAge': [input_data.CarAge],
+            'InsuranceCost': [input_data.InsuranceCost],
+            'DaysWithCompany': [input_data.DaysWithCompany],
+            'HasLicence': [input_data.HasLicence],
+            'HasDamage': [input_data.HasDamage]
+        })
 
-    # Преобразование результата в человеко-читаемый формат
-    result = "Survived" if predictions[0] == 1 else "Not Survived"
+        logger.info(f"DataFrame создан: {new_data}")
 
-    return {"prediction": result}
+        # Генерируем случайное предсказание
+        random_prediction = random.choice([0, 1])
+
+        # Преобразование результата в человеко-читаемый формат
+        result = "Купит страховку" if random_prediction == 1 else "Не купит страховку"
+
+        logger.info(f"Предсказание: {result}")
+        return {"prediction": result}
+
+    except Exception as e:
+        logger.error(f"Ошибка при обработке данных: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 if __name__ == '__main__':
     import uvicorn
