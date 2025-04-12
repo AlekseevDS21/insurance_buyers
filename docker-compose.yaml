@@ -2,7 +2,7 @@ services:
   titanic-api:
     build:
       context: .
-      dockerfile: titanic-api/Dockerfile
+      dockerfile: api_sellers/Dockerfile
       args:
         - BUILDKIT_INLINE_CACHE=1
     image: titanic-api:latest
@@ -11,7 +11,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./titanic-api/model.pkl:/app/model.pkl
+      - ./api_sellers/model.pkl:/app/model.pkl:ro
       # Для разработки:
       # - ./titanic-api:/app
 

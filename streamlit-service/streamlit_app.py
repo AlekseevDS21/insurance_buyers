@@ -46,6 +46,13 @@ days_with_company = st.text_input("Сколько дней вы были кли�
 if not days_with_company.isdigit():
     st.error("Please enter a valid number for days with company.")
 
+def get_prediction(input_data):
+    response = requests.post(
+        "http://titanic-api:5000/predict",  # исправленный URL
+        json=input_data
+    )
+    return response
+
 # Кнопка для отправки запроса
 if st.button("Predict"):
     # Проверка, что все поля заполнены корректно
@@ -70,17 +77,15 @@ if st.button("Predict"):
         
         try:
             # Отправка запроса к API
-            response = requests.post(f"http://{ip_api}:{port_api}/predict_model", 
-                                    json=data,
-                                    headers={"Content-Type": "application/json"})
+            response = get_prediction(data)
             
             logger.info(f"Код ответа: {response.status_code}")
             logger.info(f"Тело ответа: {response.text}")
             
             # Проверка статуса ответа
             if response.status_code == 200:
-                prediction = response.json()["prediction"]
-                st.success(f"Prediction: {prediction}")
+                prediction = response.json()["result"]  # изменено с prediction на result
+                st.success(f"Предсказание: {prediction}")
             else:
                 st.error(f"Ошибка запроса: {response.status_code}")
                 st.error(f"Детали: {response.text}")

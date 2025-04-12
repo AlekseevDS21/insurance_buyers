@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
 # Затем копируем только необходимые файлы
 COPY ./api_sellers/app_api.py /app/
-COPY ./api_sellers/model.pkl /app/
+# Файл model.pkl теперь монтируется через volumes
 
 # Используем конкретный порт для ясности
 EXPOSE 5000
