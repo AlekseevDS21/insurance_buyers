@@ -10,13 +10,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Сначала копируем только requirements.txt и устанавливаем зависимости
-COPY ./titanic-api/requirements.txt /app/
+COPY ./api_sellers/requirements.txt /app/
 # Оптимизируем установку pip пакетов
 RUN pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
 # Затем копируем только необходимые файлы
-COPY ./titanic-api/app_api.py /app/
-COPY ./titanic-api/model.pkl /app/
+COPY ./api_sellers/app_api.py /app/
+# Файл model.pkl теперь монтируется через volumes
 
 # Используем конкретный порт для ясности
 EXPOSE 5000
