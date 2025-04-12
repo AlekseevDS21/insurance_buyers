@@ -13,13 +13,13 @@ with open('model.pkl', 'rb') as f:
 
 
 class InsuranceInput(BaseModel):
-    Gender: str
-    Driving_License: str
-    Vehicle_Age: int
+    Pclass: int
     Age: int
-    Not_Insured_and_Damage: int
-    Annual_Premium: int
-    Vintage: int
+    CarAge: int
+    InsuranceCost: int
+    DaysWithCompany: int
+    HasLicence: int
+    HasDamage: int
 
 @app.get("/health")
 def health():
@@ -29,13 +29,13 @@ def health():
 async def predict_insurance(data: InsuranceInput):
     try:
         model_data = {
-            "Gender": 1 if data.Gender == "Мужчина" else 0,
-            "Driving_License": 1 if data.Driving_License == "Есть" else 0,
-            "Vehicle_Age": data.Vehicle_Age,
-            "Annual_Premium": data.Annual_Premium,
-            "Vintage": data.Vintage,
+            "Gender": 1 if data.Pclass == 1 else 0,
+            "Driving_License": data.HasLicence,
+            "Vehicle_Age": data.CarAge,
+            "Annual_Premium": data.InsuranceCost,
+            "Vintage": data.DaysWithCompany,
             "Age Above 38": 1 if data.Age < 38 else 0,
-            "Not_Insured and Damaged": data.Not_Insured_and_Damage
+            "Not_Insured and Damaged": data.HasDamage
         }
 
         df = pd.DataFrame([model_data])[model.feature_names_in_]
