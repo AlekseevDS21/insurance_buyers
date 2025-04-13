@@ -31,7 +31,7 @@ async def predict_insurance(data: InsuranceInput):
         model_data = {
             "Gender": 1 if data.Pclass == 1 else 0,
             "Driving_License": data.HasLicence,
-            "Vehicle_Age": data.CarAge,
+            "Vehicle_Age": 0 if data.CarAge < 1 else (1 if data.CarAge <= 2 else 2),
             "Annual_Premium": data.InsuranceCost,
             "Vintage": data.DaysWithCompany,
             "Age Above 38": 1 if data.Age < 38 else 0,
